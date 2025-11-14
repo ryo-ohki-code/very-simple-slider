@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Very Simple Slider</title>
+	<link rel="stylesheet" href="verySimpleSlider.css">
+
+	<style>
+		body {
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="slider1" class="slider-container">
+		<div id="" class="slider">
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/10/19/14/40/africa-9904004_960_720.jpg" alt="image1">
+				<div class="slide-text">Welcome to Slide 1</div>
+			</div>
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/10/23/17/29/autumn-9912491_960_720.jpg" alt="image2">
+				<div class="slide-text">Welcome to Slide 2</div>
+			</div>
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/11/03/16/30/planet-9934703_960_720.jpg" alt="image3">
+				<div class="slide-text">Welcome to Slide 3</div>
+			</div>
+			<!-- Add more slide elements as needed -->
+		</div>
+
+		<div class="slider-nav prev">&#10094;</div>
+		<div class="slider-nav next">&#10095;</div>
+		<div id="" class="slide-indicators"></div>
+	</div>
+
+	<h2>Slider 1</h2>
+	<p>Mode Fullscreen</p>
+	<p>Javescript settings</p>
+	<p>With navigation and indicator</p>
+	<p>Speed 3s</p>
+	<p>TransitionSpeed 1s</p>
+	<p>Infinite true</p>
+	<p>AutoPlay true</p>
+	<p>With text overlay on each slide</p>
+
+	<br>
+	<hr>
+	<br>
+
+	<div id="slider2" class="slider-container" data-mode="responsive" data-width="70%" data-height="500px">
+		<!-- slider-container -->
+		<!-- data-mode to set mode 'responsive' or 'fullscreen' -->
+		<!-- data-width and data-height to set size -->
+		<div id="" class="slider infinite-loop auto-play">
+			<!-- slider -->
+			<!-- add or remove auto-play class to activate or desactivate automatic play. -->
+			<!-- add or remove infinite-loop class to activate or desactivate. -->
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/10/19/14/40/africa-9904004_960_720.jpg" alt="image1">
+				<div class="slide-text">Welcome to Slide 1</div>
+			</div>
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/10/23/17/29/autumn-9912491_960_720.jpg" alt="image2">
+			</div>
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/11/03/16/30/planet-9934703_960_720.jpg" alt="image3">
+			</div>
+		</div>
+
+		<div id="" class="slide-indicators"></div>
+	</div>
+
+	<h2>Slider 2</h2>
+	<p>Mode Responsive</p>
+	<p>Html settings</p>
+	<p>Without navigation, with indicator</p>
+	<p>TransitionSpeed default</p>
+	<p>Speed 5s</p>
+	<p>Infinite true</p>
+	<p>AutoPlay true</p>
+	<p>With text overlay on 1 slide</p>
+
+	<br>
+	<hr>
+	<br>
+
+	<div id="slider3" class="slider-container">
+		<div id="" class="slider">
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/10/19/14/40/africa-9904004_960_720.jpg" alt="image1">
+			</div>
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/10/23/17/29/autumn-9912491_960_720.jpg" alt="image2">
+			</div>
+			<div class="slide">
+				<img src="https://cdn.pixabay.com/photo/2025/11/03/16/30/planet-9934703_960_720.jpg" alt="image3">
+			</div>
+		</div>
+
+		<div class="slider-nav prev">&#10094;</div>
+		<div class="slider-nav next">&#10095;</div>
+	</div>
+
+	<h2>Slider 3</h2>
+	<p>Mode Responsive</p>
+	<p>Mixed html & javescript settings</p>
+	<p>With navigation, without indicator</p>
+	<p>TransitionSpeed 2s</p>
+	<p>Speed 5s</p>
+	<p>Infinite false</p>
+	<p>AutoPlay false</p>
+	<p>Without text overlay</p>
+
+
+	<script src="verySimpleSlider.js"></script>
+	<script>
+		new Slider('slider1', {
+			mode: 'fullscreen',
+			infinite: true,
+			autoPlay: true,
+			interval: 3,
+			hoverPause: true,
+			transitionSpeed: 1
+		});
+
+		new Slider('slider2');
+
+		new Slider('slider3', {
+			mode: 'responsive',
+			width: '50%',
+			height: '600px',
+			infinite: false,
+			interval: 5,
+			transitionSpeed: 2
+		});
+	</script>
+</body>
+
+</html>
