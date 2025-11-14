@@ -255,11 +255,6 @@ The slider includes built-in security measures:
 
 
 
-## License
-MIT
-
-
-
 ## About VSP
 Why reinvent the wheel?
 
@@ -268,3 +263,8 @@ There are already countless sliders available. But sometimes you can't find what
 That's why I created **Very Simple Slider**, to provide a clean, straightforward solution that just works.
 
 I hope you find it helpful and enjoy using it!
+
+
+
+## License
+MIT
