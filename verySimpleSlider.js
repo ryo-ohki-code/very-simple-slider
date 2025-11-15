@@ -3,8 +3,10 @@ const sizeRegex = /^\d+(\.\d+)?(%|px|em|rem|vw|vh|pt|cm|mm|in|pc|ex|ch|vmin|vmax
 class Slider {
 	constructor(containerId, options = {}) {
 		this.container = document.getElementById(containerId);
+
 		this.slider = this.container.querySelector('.slider');
 		this.slides = this.container.querySelectorAll('.slide');
+
 		this.prevBtn = this.container.querySelector('.prev');
 		this.nextBtn = this.container.querySelector('.next');
 
@@ -23,6 +25,7 @@ class Slider {
 
 		this.isInfinite = options.infinite || this.container.querySelector('.infinite-loop') !== null;
 		this.isAutoPlay = options.autoPlay || this.container.querySelector('.auto-play') !== null;
+		this.ishoverPause = options.hoverPause || this.container.querySelector('.hover-pause') !== null;
 
 		this.sliderSpeed = Number(options.interval) * 1000 || 5000;
 		if (isNaN(this.sliderSpeed) || this.sliderSpeed < 0 || this.sliderSpeed > 100000) {
@@ -42,11 +45,17 @@ class Slider {
 		this.slideInterval = null;
 
 		this.isSliding = false;
-		this.ishoverPause = options.hoverPause || this.container.querySelector('.hover-pause') !== null;
 
-		this.slider.addEventListener('transitionend', () => {
-			this.isSliding = false;
+		this.slider.addEventListener('transitionend', (event) => {
+			// Check if the transition was for transform (This avoid false positive from textElement 'translate')
+			if (event.propertyName === 'transform') {
+				this.isSliding = false;
+			}
 		});
+
+		this.touchStartX = 0;
+		this.touchEndX = 0;
+		// this.touchStartTime = 0;
 
 		this.init();
 	}
@@ -61,7 +70,11 @@ class Slider {
 		this.createIndicators();
 		this.bindEvents();
 
-		this.currentIndex = 1; // Because of inserted clone at the start
+		if (this.isInfinite) {
+			this.currentIndex = 1; // Because of inserted clone at the start
+		} else {
+			this.currentIndex = 0; // For classic rewind mode.
+		}
 		this.slider.style.transition = 'none'; // Display without transition at load
 		this.updateSlider();
 
@@ -85,7 +98,6 @@ class Slider {
 		if (!sizeRegex.test(size)) return '450px';
 		return size;
 	}
-
 
 	sanitizeSlides() {
 		// Get the slider element
@@ -140,7 +152,7 @@ class Slider {
 			'onfocus', 'onblur', 'onsubmit', 'onkeydown', 'onkeyup',
 			'onkeypress', 'ondblclick', 'onmousedown', 'onmouseup',
 			'action', 'data', 'formaction', 'onbeforeunload'
-		];
+		]; // Removed for image or link: 'href', 'src'
 
 		// Remove from current element
 		dangerousAttrs.forEach(attr => {
@@ -168,7 +180,6 @@ class Slider {
 		});
 	}
 
-
 	applyStyles() {
 		if (this.mode === 'fullscreen') {
 			this.container.style.width = '100vw';
@@ -183,6 +194,10 @@ class Slider {
 		}
 
 		this.slides.forEach(slide => {
+
+			const overlay = slide.querySelector('.overlay');
+			if (overlay) slide.style.position = 'relative'; // Ensure overlay positioning works
+
 			const img = slide.querySelector('img');
 			if (img) {
 				if (this.mode === 'fullscreen') {
@@ -196,29 +211,34 @@ class Slider {
 		});
 	}
 
+	// Create duplicate slides for infinite scrolling effect
+	// This is only executed when infinite loop is enabled
 	duplicateSlides() {
 		if (!this.isInfinite) return;
 
-		const firstSlide = this.slides[0].cloneNode(true);
+		const firstSlide = this.slides[0].cloneNode(true); // Clone the first slide and append it to the end
 
-		const lastSlide = this.slides[this.slides.length - 1].cloneNode(true);
+		const lastSlide = this.slides[this.slides.length - 1].cloneNode(true); // Clone the last slide and insert it at the beginning
 
+		// Add cloned slides to the slider
 		this.slider.appendChild(firstSlide);
 		this.slider.insertBefore(lastSlide, this.slider.firstChild);
 
-		this.realSlidesCount = this.slider.querySelectorAll('.slide').length;
+		this.realSlidesCount = this.slider.querySelectorAll('.slide').length; // Update the total slide count to include duplicates
 	}
 
+
+	// Create navigation indicators (dots) for slide navigation
 	createIndicators() {
 		if (this.isIndicator) {
-			this.indicatorsContainer.innerHTML = '';
+			this.indicatorsContainer.innerHTML = ''; // Clear existing indicators
 			for (let i = 0; i < this.totalSlides; i++) {
 				const indicator = document.createElement('div');
 				indicator.classList.add('indicator');
 
-				if (i === 0) indicator.classList.add('active');
+				if (i === 0) indicator.classList.add('active'); // Mark the first indicator as active
 
-				indicator.addEventListener('click', () => this.goToSlide(i));
+				indicator.addEventListener('click', () => this.goToSlide(i)); // Add click event listener to navigate to specific slide
 				this.indicatorsContainer.appendChild(indicator);
 			}
 		}
@@ -226,37 +246,109 @@ class Slider {
 
 	bindEvents() {
 		if (this.isDirectionBtn) {
-			this.nextBtn.addEventListener('click', () => this.nextSlide());
-			this.prevBtn.addEventListener('click', () => this.prevSlide());
+			this.nextBtn.addEventListener('click', () => this.nextSlide()); // Next button clicks advance to next slide
+			this.prevBtn.addEventListener('click', () => this.prevSlide()); // Previous button clicks go to previous slide
 		}
 
 		if (this.isAutoPlay) {
 			if (this.ishoverPause) {
-				this.container.addEventListener('mouseenter', () => this.pauseAutoPlay());
-				this.container.addEventListener('mouseleave', () => this.startAutoPlay());
+				this.container.addEventListener('mouseenter', () => this.pauseAutoPlay()); // Pause auto-play when mouse enters container
+				this.container.addEventListener('mouseleave', () => this.startAutoPlay()); // Resume auto-play when mouse leaves container
 			}
 		}
 
 		// Keyboard Arrow control
-		document.addEventListener('keydown', (e) => {
-			if (e.key === 'ArrowLeft') this.prevSlide();
-			if (e.key === 'ArrowRight') this.nextSlide();
+		this.container.addEventListener('click', () => {
+			this.container.style.outline = 'none'; // Remove red border on first focus
+			this.container.tabIndex = 0; // Make container focusable (0 means it can receive focus via tab key)
+			this.container.focus(); // Give focus to the container so keyboard events are captured
 		});
+
+		document.addEventListener('keydown', (e) => {
+			// console.log(this.container.contains(document.activeElement), e.target === this.container, this.container.contains(e.target), this.container === document.activeElement)
+			if (e.target === this.container || this.container.contains(e.target)) {
+				if (e.key === 'ArrowLeft') this.prevSlide(); // Arrow left advance to prev slide
+				if (e.key === 'ArrowRight') this.nextSlide(); // Arrow right advance to next slide
+			}
+		});
+
+		// Touchscreen swipe control
+		document.addEventListener('touchstart', (e) => {
+			// Only handle swipes on the slider container
+			if (e.target === this.container || this.container.contains(e.target)) {
+				this.touchStartX = e.changedTouches[0].screenX;
+				// this.touchStartTime = Date.now();
+			}
+		});
+
+		document.addEventListener('touchend', (e) => {
+			// Only handle swipes on the slider container
+			if (e.target === this.container || this.container.contains(e.target)) {
+				this.touchEndX = e.changedTouches[0].screenX;
+				this.handleSwipe();
+			}
+		});
+
+
+	}
+
+	handleSwipe() {
+		const swipeThreshold = 50;
+		const diff = this.touchStartX - this.touchEndX;
+		// const touchDuration = Date.now() - this.touchStartTime;
+
+		if (Math.abs(diff) > swipeThreshold) {
+			if (diff > 0) {
+				this.nextSlide(); // Swipe left - go to next slide
+			} else {
+				this.prevSlide(); // Swipe right - go to previous slide
+			}
+		}
 	}
 
 	updateSlider() {
 		// Ensure slide-text elements are styled properly
 		this.slides.forEach((slide, index) => {
 			const textElement = slide.querySelector('.slide-text');
+			const overlay = slide.querySelector('.overlay');
 			if (textElement) {
 				if (textElement.classList.contains('show')) textElement.classList.remove('show');
 
-				if (this.currentIndex - 1 === this.totalSlides && index === 0 || // First slide duplicate
-					this.currentIndex === 0 && index === this.totalSlides - 1 || // Last slide duplicate
-					this.currentIndex - 1 === index
-				) {
-					textElement.classList.add('show');
-					textElement.style.transform = `translate(${(this.currentIndex * 100) - 50}%, -50%)`;
+				let shouldShow = false;
+
+				if (!this.isInfinite) { // Rewind setting
+					if (this.currentIndex === index) {
+						shouldShow = true;
+					}
+				} else {  // Infinite loop setting
+					if (this.currentIndex - 1 === this.totalSlides && index === 0 || // First slide clone
+						this.currentIndex === 0 && index === this.totalSlides - 1 || // Last slide clone
+						this.currentIndex - 1 === index
+					) {
+						shouldShow = true;
+					}
+				}
+
+				if (shouldShow) {
+					if (overlay) {
+						// Overlay setting
+						textElement.classList.add('show');
+
+						if (this.currentIndex - 1 === this.totalSlides && index === 0) { // First slide clone
+							console.log('first clone', index, this.currentIndex)
+							textElement.style.transform = `translate(${((index + 2) * 100) + 50}%, -50%)`;
+
+						} else if (this.currentIndex === 0 && index === this.totalSlides - 1) {  // Last slide clone
+							textElement.style.transform = `translate(-${((index + 1) * 100) + 50}%, -50%)`;
+
+						} else {
+							textElement.style.transform = `translate(-50%, -50%)`;
+						}
+
+					} else { // Without overlay setting
+						textElement.classList.add('show');
+						textElement.style.transform = `translate(${(this.currentIndex * 100) - 50}%, -50%)`;
+					}
 				}
 			}
 		});
@@ -268,9 +360,12 @@ class Slider {
 			indicators.forEach((indicator, index) => {
 				let activeIndex = index;
 
-				activeIndex = (this.currentIndex - 1) % this.slides.length;
-
-				if (activeIndex === -1) activeIndex = this.slides.length - 1; // Specific position for first slide duplicate
+				if (this.isInfinite) {
+					activeIndex = (this.currentIndex - 1) % this.slides.length;
+					if (activeIndex === -1) activeIndex = this.slides.length - 1; // Specific position for first slide duplicate
+				} else {
+					activeIndex = (this.currentIndex) % this.slides.length;
+				}
 
 				if (index === activeIndex) {
 					indicator.classList.add('active');
@@ -282,44 +377,49 @@ class Slider {
 	}
 
 	goToSlide(index) {
+		console.log(index)
 		if (index < 0 || index >= this.totalSlides) return; // Deny out-of-Bounds Access
-		this.currentIndex = index + 1;
+		
+		if (this.isInfinite) {
+			this.currentIndex = index + 1;
+		} else{
+			this.currentIndex = index;
+		}
+		
 		this.updateSlider();
 	}
 
+	// Navigate to the next slide
 	nextSlide() {
-		if (this.isSliding) return;
+		if (this.isSliding) return; // Lock to avoid multiple simultaneous calls
 		this.isSliding = true;
 
-		if (this.isInfinite) {
+		if (this.isInfinite) { // Infinite loop setting
 			this.currentIndex++;
-			if (this.currentIndex > this.realSlidesCount - 1) {
-				this.currentIndex = 1;
-				this.slider.style.transition = 'none';
+			if (this.currentIndex > this.realSlidesCount - 1) { // If reached the end of duplicated slides
+				this.currentIndex = 1; // Jump back to the first duplicated slide (which is the original last slide)
+				this.slider.style.transition = 'none'; // Temporarily remove transition
 				this.updateSlider();
 				setTimeout(() => {
-					this.slider.style.transition = 'transform ' + this.transitionSpeed + 's ease-in-out';
-					this.currentIndex = 2;
+					this.slider.style.transition = 'transform ' + this.transitionSpeed + 's ease-in-out'; // Restore transition
+					this.currentIndex = 2; // Set to second slide (which is the original first slide after duplication)
 					this.updateSlider();
-				}, 50);
+				}, 10);
 			} else {
 				this.updateSlider();
 			}
-		} else {
+		} else { // Rewind setting - loop back to first slide after last
 			this.currentIndex = (this.currentIndex + 1) % this.totalSlides;
 			this.updateSlider();
 		}
 
-		// Unlock Slide after sliderSpeed timeout
+		// Unlock slide navigation after transition completes
 		setTimeout(() => {
 			this.isSliding = false;
-		}, this.sliderSpeed);
-		// Reset interval 
-		setTimeout(() => {
-			this.startAutoPlay();
-		}, this.transitionSpeed);
+		}, this.transitionSpeed * 1000);
 	}
 
+	// Navigate to the previous slide
 	prevSlide() {
 		if (this.isSliding) return;
 		this.isSliding = true;
@@ -344,10 +444,7 @@ class Slider {
 		}
 		setTimeout(() => {
 			this.isSliding = false;
-		}, this.sliderSpeed);
-		setTimeout(() => {
-			this.startAutoPlay();
-		}, this.transitionSpeed);
+		}, this.transitionSpeed * 1000);
 	}
 
 	startAutoPlay() {
