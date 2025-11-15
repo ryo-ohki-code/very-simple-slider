@@ -2,22 +2,24 @@
 
 A lightweight, responsive and secure slider with smooth transitions and multiple modes.
 
-It is responsive, slide and does it well.
+It is responsive, slide, and does it well.
 
 
 
 ## Features
 - Responsive design - Works on all device sizes
 - Two display modes - Fullscreen and responsive modes
-- Two operation modes - Classic rewind or infinite loop
+- Two slide modes - Classic rewind or infinite loop
 - Simple navigation - Previous/next buttons and indicators
-- Indicator Dots: Visual navigation controls
+- Indicator dots - Visual navigation controls
 - Lightweight - Minimal code, maximum performance
-- Customizable: Configurable width, height, transition speed, and interval
+- Customizable - Configurable width, height, transition speed, and interval
 - Auto-play with pause on hover
-- Text overlay
-- Keyboard Navigation: Arrow keys support
-- Security: Sanitizes slides to prevent XSS attacks
+- Slider text overlay
+- Event blocking overlay
+- Keyboard navigation - Arrow keys support
+- Touchscreen swipe navigation
+- Security - Sanitizes slides to prevent XSS attacks
 
 
 
@@ -31,18 +33,23 @@ It is responsive, slide and does it well.
 
 2. Add the HTML structure:
 ```html
+<!-- slider-container -->
+<!-- data-mode to set mode 'responsive' or 'fullscreen' -->
+<!-- data-width and data-height to set size -->
 <div id="slider1" class="slider-container" data-mode="responsive" data-width="70%" data-height="500px">
-    <!-- slider-container -->
-    <!-- data-mode to set mode 'responsive' or 'fullscreen' -->
-    <!-- data-width and data-height to set size -->
+    <!-- slider -->
+    <!-- add or remove auto-play class to activate or desactivate automatic play. -->
+    <!-- add or remove infinite-loop class to activate or desactivate. -->
     <div class="slider infinite-loop auto-play">
-        <!-- slider -->
-        <!-- add or remove auto-play class to activate or desactivate automatic play. -->
-        <!-- add or remove infinite-loop class to activate or desactivate. -->
         <div class="slide">
-            <img src="image1.jpg" alt="image1">
+            <!-- Event blocking overlay (optionnal) -->
+            <div class="overlay"></div>
+
             <!-- Text overlay (optionnal) -->
             <div class="slide-text"><h1>Welcome to Slide 1</h1></div>
+
+            <!-- Slide Image -->
+            <img src="image1.jpg" alt="image1">
         </div>
         <div class="slide">
             <img src="image2.jpg" alt="image2">
@@ -75,12 +82,26 @@ All sliders must be initialized on page load using:
 
 
 
+## Usage Modes
+The slider(s) needs to be initialized on page load.
+
+```javascript
+const slider = new Slider('slider1');
+```
+
+It can be configured using HTML attributes, javascript or both.
+
+A working demo with multiple example is available in demo.html in the repository.
+
+
+
 ## Configuration
 
-### JavaScript Configuration
+### Advanced Javascript Configuration
+You can configure the slider using JavaScript for more advanced settings:
 
-| Configuration Options | Option | Type | Default | Description |
-|----------------------|--------|------|---------|-------------|
+| Option | Type | Default | Description |
+|----------------------|------|---------|-------------|
 | `mode` | string | 'responsive' | 'responsive' or 'fullscreen' |
 | `width` | string | '100%' | Custom width for responsive mode |
 | `height` | string | '450px' | Custom height for responsive mode |
@@ -93,11 +114,8 @@ All sliders must be initialized on page load using:
 Note: If both HTML data attributes and JavaScript options are provided, the JavaScript configuration takes precedence.
 
 
-#### Advanced Settings
-You can configure the slider using JavaScript for more advanced settings:
-
 ```javascript
-new Slider('slider1', {
+const slider1 = new Slider('slider1', {
     mode: 'fullscreen',           // 'responsive' or 'fullscreen' - Default 'responsive'
     infinite: true,               // Enable infinite loop - Default false
     autoPlay: true,               // Enable auto-play - Default false
@@ -106,7 +124,7 @@ new Slider('slider1', {
     transitionSpeed: 1            // Transition animation speed in seconds - Default 0.5
 });
 
-new Slider('slider2', {
+const slider2 = new Slider('slider2', {
     mode: 'responsive',
     width: '70%',                 // Custom width
     height: '600px',              // Custom height
@@ -119,48 +137,23 @@ new Slider('slider2', {
 ```
 
 
-### HTML Configuration via data-* attribute
+### Detailed HTML Configuration
 
+**HTML Configuration via data-* attribute**
 | HTML Data | Description |
 |------------|-------------|
 | `data-mode` | Set the slider mode |
 
 
-### HTML Class Names
-
+**HTML Configuration Class Names**
 | HTML Class Name | Description |
 |------------|-------------|
 | `.infinite-loop` | Enable infinite looping |
 | `.auto-play` | Enable auto-play |
-| `.hover-pause` | Enable hover pause |
+| `.hover-pause` | Enables pausing of auto-play on hover |
 
 
-### CSS Class Names
-
-| CSS Class Name | Description |
-|------------|-------------|
-| `.slider-container` | Main container |
-| `.slider` | Slider wrapper |
-| `.slide` | Individual slide |
-| `.slide-text` | Slide text content |
-| `.prev` | Previous button |
-| `.next` | Next button |
-| `.slide-indicators` | Indicator container |
-| `.indicator` | Individual indicator dot |
-| `.active` | Active indicator |
-
-
-
-## Usage Modes
-The slider(s) needs to be initialized on page load.
-```javascript
-new Slider('slider1');
-```
-
-A working demo is available in demo.html in the repository.
-
-
-### Mode Selection 
+#### Mode Selection 
 Set the slider mode using the `data-mode` attribute on the container:
 
 - data-mode="fullscreen": Fullscreen mode (100vw x 100vh)
@@ -176,7 +169,7 @@ Set the slider mode using the `data-mode` attribute on the container:
 - No data-mode attribute: Defaults to responsive mode
 
 
-### Auto-play/Auto-slide
+#### Auto-play/Auto-slide
 Add/Remove the `auto-play` class to enable/disable automatic play
 
 ```html
@@ -184,7 +177,7 @@ Add/Remove the `auto-play` class to enable/disable automatic play
 ```
 
 
-### Hover Pause
+#### Hover Pause
 Add/Remove the `hover-pause` class to enable/disable slide pause on hover
 
 ```html
@@ -192,7 +185,7 @@ Add/Remove the `hover-pause` class to enable/disable slide pause on hover
 ```
 
 
-### Infinite Loop Mode
+#### Infinite Loop Mode
 Add the `infinite-loop` class to enable continuous looping:
 
 ```html
@@ -200,11 +193,11 @@ Add the `infinite-loop` class to enable continuous looping:
 ```
 
 
-### Classic Rewind Mode
+#### Classic Rewind Mode
 Remove the `infinite-loop` class for traditional back-and-forth navigation
 
 
-### Combined Usage Example
+#### Combined Usage Example
 ```html
 <div id="slider1" class="slider-container" data-mode="responsive" data-width="600px" data-height="300px">
     <div class="slider infinite-loop auto-play hover-pause">
@@ -214,22 +207,49 @@ Remove the `infinite-loop` class for traditional back-and-forth navigation
 ```
 
 
+
+## Overlay
+
 ### Text Overlay
 Add a `slide-text` div inside the `slide` div with the image:
 ```html
 <div class="slide">
-    <img src="image.jpg" alt="Description">
     <div class="slide-text">Your overlay text here</div>
+    <img src="image.jpg" alt="Description">
 </div>
 ```
 
 To modify image size inside text overlay adapt `.slide-text img` in the .css file
 
 
+### Event Blocking Overlay
+```
+<div id="slider" class="slider-container">
+	<div class="slider">
+		<div class="slide">
+			<div class="overlay"></div>
+            <img src="image1.jpg" alt="image1">
+```
 
-## Keyboard Support
+
+### Combined Overlay Example
+```
+<div id="slider" class="slider-container">
+	<div class="slider">
+		<div class="slide">
+			<div class="overlay"></div>
+            <div class="slide-text">Your overlay text here</div>
+            <img src="image1.jpg" alt="image1">
+```
+
+
+
+## Keyboard & Touchscreen Swipe Support
 Left Arrow: Previous slide
 Right Arrow: Next slide
+
+Left Swipe: Previous slide
+Right Swipe: Next slide
 
 
 
@@ -252,6 +272,23 @@ The slider includes built-in security measures:
 - Sanitizes inline event handlers (onclick, onload, etc.)
 - Removes dangerous attributes and elements
 - Prevents XSS attacks
+
+
+
+## CSS Design Class Names
+
+| CSS Class Name | Description |
+|------------|-------------|
+| `.slider-container` | Main container |
+| `.slider` | Slider wrapper |
+| `.slide` | Individual slide |
+| `.slide-text` | Slide text content |
+| `.prev` | Previous button |
+| `.next` | Next button |
+| `.slide-indicators` | Indicator container |
+| `.indicator` | Individual indicator dot |
+| `.active` | Active indicator |
+| `.overlay` | Event blocking overlay |
 
 
 
