@@ -16,18 +16,21 @@
 
 <body>
 	<div id="slider1" class="slider-container">
-		<div id="" class="slider">
+		<div class="slider">
 			<div class="slide">
-				<img src="https://cdn.pixabay.com/photo/2025/10/19/14/40/africa-9904004_960_720.jpg" alt="image1">
+				<div class="overlay"></div>
 				<div class="slide-text">Welcome to Slide 1</div>
+				<img src="https://cdn.pixabay.com/photo/2025/10/19/14/40/africa-9904004_960_720.jpg" alt="image1">
 			</div>
 			<div class="slide">
-				<img src="https://cdn.pixabay.com/photo/2025/10/23/17/29/autumn-9912491_960_720.jpg" alt="image2">
+				<div class="overlay"></div>
 				<div class="slide-text">Welcome to Slide 2</div>
+				<img src="https://cdn.pixabay.com/photo/2025/10/23/17/29/autumn-9912491_960_720.jpg" alt="image2">
 			</div>
 			<div class="slide">
-				<img src="https://cdn.pixabay.com/photo/2025/11/03/16/30/planet-9934703_960_720.jpg" alt="image3">
+				<div class="overlay"></div>
 				<div class="slide-text">Welcome to Slide 3</div>
+				<img src="https://cdn.pixabay.com/photo/2025/11/03/16/30/planet-9934703_960_720.jpg" alt="image3">
 			</div>
 			<!-- Add more slide elements as needed -->
 		</div>
@@ -38,9 +41,10 @@
 	</div>
 
 	<h2>Slider 1</h2>
+	<p>Javascript settings</p>
 	<p>Mode Fullscreen</p>
-	<p>Javescript settings</p>
 	<p>With navigation and indicator</p>
+	<p>Overlay on all slide</p>
 	<p>Speed 3s</p>
 	<p>TransitionSpeed 1s</p>
 	<p>Infinite true</p>
@@ -51,17 +55,17 @@
 	<hr>
 	<br>
 
+	<!-- slider-container -->
+	<!-- data-mode to set mode 'responsive' or 'fullscreen' -->
+	<!-- data-width and data-height to set size -->
 	<div id="slider2" class="slider-container" data-mode="responsive" data-width="70%" data-height="500px">
-		<!-- slider-container -->
-		<!-- data-mode to set mode 'responsive' or 'fullscreen' -->
-		<!-- data-width and data-height to set size -->
-		<div id="" class="slider infinite-loop auto-play">
-			<!-- slider -->
-			<!-- add or remove auto-play class to activate or desactivate automatic play. -->
-			<!-- add or remove infinite-loop class to activate or desactivate. -->
+		<!-- slider -->
+		<!-- add or remove auto-play class to activate or desactivate automatic play. -->
+		<!-- add or remove infinite-loop class to activate or desactivate. -->
+		<div class="slider infinite-loop auto-play">
 			<div class="slide">
-				<img src="https://cdn.pixabay.com/photo/2025/10/19/14/40/africa-9904004_960_720.jpg" alt="image1">
 				<div class="slide-text">Welcome to Slide 1</div>
+				<img src="https://cdn.pixabay.com/photo/2025/10/19/14/40/africa-9904004_960_720.jpg" alt="image1">
 			</div>
 			<div class="slide">
 				<img src="https://cdn.pixabay.com/photo/2025/10/23/17/29/autumn-9912491_960_720.jpg" alt="image2">
@@ -75,9 +79,10 @@
 	</div>
 
 	<h2>Slider 2</h2>
+	<p>HTML settings</p>
 	<p>Mode Responsive</p>
-	<p>Html settings</p>
 	<p>Without navigation, with indicator</p>
+	<p>No overlay</p>
 	<p>TransitionSpeed default</p>
 	<p>Speed 5s</p>
 	<p>Infinite true</p>
@@ -88,15 +93,18 @@
 	<hr>
 	<br>
 
-	<div id="slider3" class="slider-container">
-		<div id="" class="slider">
+	<div id="slider3" class="slider-container" data-mode="responsive">
+		<div class="slider auto-play">
 			<div class="slide">
+				<div class="overlay"></div>
 				<img src="https://cdn.pixabay.com/photo/2025/10/19/14/40/africa-9904004_960_720.jpg" alt="image1">
 			</div>
-			<div class="slide">
+			<div class="slide overlay">
+				<!-- No overlay -->
 				<img src="https://cdn.pixabay.com/photo/2025/10/23/17/29/autumn-9912491_960_720.jpg" alt="image2">
 			</div>
 			<div class="slide">
+				<div class="overlay"></div>
 				<img src="https://cdn.pixabay.com/photo/2025/11/03/16/30/planet-9934703_960_720.jpg" alt="image3">
 			</div>
 		</div>
@@ -106,31 +114,34 @@
 	</div>
 
 	<h2>Slider 3</h2>
-	<p>Mode Responsive</p>
-	<p>Mixed html & javescript settings</p>
+	<p>Mixed HTML & Javascript settings</p>
+	<p>Mode Responsive (HTML) - Size (Javascript)</p>
 	<p>With navigation, without indicator</p>
-	<p>TransitionSpeed 2s</p>
-	<p>Speed 5s</p>
-	<p>Infinite false</p>
-	<p>AutoPlay false</p>
+	<p>Overlay on slide 1 and 3</p>
+	<p>TransitionSpeed 2s (Javascript)</p>
+	<p>Speed 5s (Javascript)</p>
+	<p>Infinite false (Javascript)</p>
+	<p>AutoPlay true (HTML)</p>
 	<p>Without text overlay</p>
 
 
 	<script src="verySimpleSlider.js"></script>
 	<script>
+		// Full Javascript setting
 		new Slider('slider1', {
 			mode: 'fullscreen',
 			infinite: true,
 			autoPlay: true,
-			interval: 3,
 			hoverPause: true,
+			interval: 3,
 			transitionSpeed: 1
 		});
 
+		// Full HTML setting
 		new Slider('slider2');
 
+		// Mixed setting
 		new Slider('slider3', {
-			mode: 'responsive',
 			width: '50%',
 			height: '600px',
 			infinite: false,
